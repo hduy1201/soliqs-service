@@ -7,22 +7,21 @@ import {
   Delete,
   Headers,
   HttpException,
-  InternalServerErrorException,
-  NotFoundException,
   Put,
-  ConflictException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthService } from 'src/middlewares/auth/auth.service';
+import { AuthService } from 'src/auth/auth.service';
 import { User } from './entities/user.entity';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('v1/user')
 export class UserController {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private profileService: ProfileService,
   ) {}
 
   @Post()
@@ -32,9 +31,9 @@ export class UserController {
       const token = authHeader.replace('Bearer ', '');
       const decodedToken = await this.authService.verifyToken(token);
       const uid = decodedToken.uid;
-      const existingUser = await this.userService.findOne(uid);
-      if (existingUser) {
-        throw new ConflictException('User already exists');
+      const existedUser = await this.userService.findOne(uid);
+      if (existedUser) {
+        throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
       }
       const user: User = {
         uid,
@@ -46,18 +45,8 @@ export class UserController {
       const createdUser = await this.userService.create(user);
       return createdUser;
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Failed to create user');
-      }
+      throw error;
     }
-  }
-
-  //chưa sử dụng
-  @Get()
-  findAll() {
-    return this.userService.findAll();
   }
 
   @Get(':id')
@@ -65,15 +54,11 @@ export class UserController {
     try {
       const user = await this.userService.findOne(id);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
       }
       return user;
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Failed to find user');
-      }
+      throw error;
     }
   }
 
@@ -85,21 +70,36 @@ export class UserController {
     try {
       const user = await this.userService.update(id, updateUserDto);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
       }
       return user;
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Failed to update user');
+      throw error;
+    }
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    try {
+      const user = await this.userService.findOne(id);
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
       }
+      const userProfile = await this.profileService.findOne(user.profile);
+      if (!userProfile) {
+        await this.userService.remove(id);
+      } else {
+        await this.profileService.remove(userProfile.id);
+        await this.userService.remove(id);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
   //chưa sử dụng
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Get()
+  findAll() {
+    return this.userService.findAll();
   }
 }

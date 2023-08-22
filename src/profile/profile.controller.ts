@@ -6,6 +6,8 @@ import {
   Param,
   Delete,
   Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -22,40 +24,74 @@ export class ProfileController {
 
   @Post()
   async create(@Body() createProfileDto: CreateProfileDto): Promise<Profile> {
-    // const isExist = this.profileService.findOne(createProfileDto.id);
-    // if (isExist) {
-    //   throw new Error('Profile already exists');
-    // }
-    const newProfile = await this.profileService.create(createProfileDto);
-    if (!newProfile) {
-      try {
-        await this.userService.remove(createProfileDto.id);
-      } catch (error) {
-        throw new Error(error);
+    try {
+      const isExist = await this.profileService.findOne(createProfileDto.id);
+      if (isExist) {
+        throw new HttpException(
+          'Profile already exists',
+          HttpStatus.BAD_REQUEST,
+        );
       }
-    } else {
-      this.userService.update(createProfileDto.id, { profile: newProfile.id });
+      const newProfile = await this.profileService.create(createProfileDto);
+      if (!newProfile) {
+        try {
+          await this.userService.remove(createProfileDto.id);
+        } catch (error) {
+          throw new Error(error);
+        }
+      } else {
+        this.userService.update(createProfileDto.id, {
+          profile: newProfile.id,
+        });
+      }
+      return newProfile;
+    } catch (error) {
+      throw error;
     }
-    return newProfile;
-  }
-
-  @Get()
-  findAll() {
-    return this.profileService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const profile = await this.profileService.findOne(id);
+      if (!profile) {
+        throw new HttpException('Profile not found', HttpStatus.BAD_REQUEST);
+      }
+      return profile;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(id, updateProfileDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    try {
+      const updatedProfile = await this.profileService.update(
+        id,
+        updateProfileDto,
+      );
+      if (!updatedProfile) {
+        throw new HttpException('Profile not found', HttpStatus.BAD_REQUEST);
+      }
+      return updatedProfile;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(id);
+  async remove(@Param('id') id: string) {
+    try {
+      const deletedProfile = await this.profileService.remove(id);
+      if (!deletedProfile) {
+        throw new HttpException('Profile not found', HttpStatus.BAD_REQUEST);
+      }
+      return deletedProfile;
+    } catch (error) {
+      throw error;
+    }
   }
 }

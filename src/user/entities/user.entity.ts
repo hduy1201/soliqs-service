@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsEmail } from 'class-validator';
 import mongoose, { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
@@ -8,6 +9,7 @@ export class User {
   @Prop({ required: true, unique: true })
   uid: string;
 
+  @IsEmail()
   @Prop({ required: true, unique: true })
   email: string;
 
@@ -17,7 +19,7 @@ export class User {
   @Prop()
   picture: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
+  @Prop({ default: null })
   profile: string;
 }
 

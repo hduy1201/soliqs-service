@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsEmail } from 'class-validator';
 import mongoose, { HydratedDocument } from 'mongoose';
 
 export type ProfileDocument = HydratedDocument<Profile>;
@@ -11,49 +12,50 @@ export class Profile {
   @Prop({ required: true, unique: true })
   userName: string;
 
-  @Prop()
+  @Prop({ default: null })
   displayName: string;
 
+  @IsEmail()
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
+  @Prop({ default: null })
   phone: string;
 
-  @Prop()
+  @Prop({ default: null })
   country: string;
 
-  @Prop()
+  @Prop({ default: null })
   avatar: string;
 
-  @Prop()
+  @Prop({ default: null })
   cover: string;
 
-  @Prop()
+  @Prop({ default: null })
   bio: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
+  @Prop({ default: null })
   followers: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
+  @Prop({ default: null })
   following: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: null })
+  @Prop({ default: null })
   posts: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: null })
+  @Prop({ default: null })
   saved: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', default: null })
+  @Prop({ default: null })
   tag: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
+  @Prop({ default: null })
   blocked: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', default: null })
+  @Prop({ default: null })
   groups: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', default: null })
+  @Prop({ default: null })
   notifications: string[];
 
   @Prop({

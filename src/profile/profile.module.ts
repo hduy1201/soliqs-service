@@ -8,7 +8,7 @@ import { UserModule } from 'src/user/user.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Profile', schema: ProfileSchema }]),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [ProfileController],
   providers: [ProfileService],

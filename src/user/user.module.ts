@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './entities/user.entity';
-import { AuthModule } from 'src/middlewares/auth/auth.module';
+import { AuthModule } from 'src/auth/auth.module';
 import { ProfileModule } from 'src/profile/profile.module';
 import { ProfileSchema } from 'src/profile/entities/profile.entity';
 
@@ -14,6 +14,7 @@ import { ProfileSchema } from 'src/profile/entities/profile.entity';
       { name: 'Profile', schema: ProfileSchema },
     ]),
     AuthModule,
+    forwardRef(() => ProfileModule),
   ],
   controllers: [UserController],
   providers: [UserService],

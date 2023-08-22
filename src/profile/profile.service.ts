@@ -1,5 +1,6 @@
 import {
   HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -21,36 +22,40 @@ export class ProfileService {
       const profile = new this.profileModel(createProfileDto);
       return await profile.save();
     } catch (error) {
-      // if (error instanceof HttpException) {
-      //   throw error;
-      // } else {
-      //   throw new InternalServerErrorException('Failed to create profile');
-      // }
-      console.log(error);
+      throw new HttpException(error.message, error.status);
     }
-  }
-
-  findAll() {
-    return `This action returns all profile`;
   }
 
   async findOne(id: string): Promise<Profile> {
     try {
-      const profile = await this.profileModel.findById(id);
-      if (!profile) {
-        throw new NotFoundException('Profile not found');
-      }
+      const profile = await this.profileModel.findOne({ id: id });
       return profile;
     } catch (error) {
-      return error;
+      throw new HttpException(error.message, error.status);
     }
   }
 
-  update(id: string, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(id: string, updateProfileDto: UpdateProfileDto) {
+    try {
+      const updatedProfile = await this.profileModel.findOneAndUpdate(
+        { id: id },
+        { ...updateProfileDto },
+        { new: true },
+      );
+      return updatedProfile;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
-  remove(id: String) {
-    return `This action removes a #${id} profile`;
+  async remove(id: string) {
+    try {
+      const deletedProfile = await this.profileModel.findOneAndDelete({
+        id: id,
+      });
+      return deletedProfile;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 }
