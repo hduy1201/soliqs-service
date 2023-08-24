@@ -88,6 +88,8 @@ export class ProfileController {
       const deletedProfile = await this.profileService.remove(id);
       if (!deletedProfile) {
         throw new HttpException('Profile not found', HttpStatus.BAD_REQUEST);
+      } else {
+        this.userService.update(id, { profile: null });
       }
       return deletedProfile;
     } catch (error) {

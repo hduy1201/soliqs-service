@@ -34,28 +34,26 @@ export class Profile {
   @Prop({ default: null })
   bio: string;
 
-  @Prop({ default: null })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
   followers: string[];
 
-  @Prop({ default: null })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
   following: string[];
 
-  @Prop({ default: null })
-  posts: string[];
-
-  @Prop({ default: null })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: null })
   saved: string[];
 
-  @Prop({ default: null })
-  tag: string[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', default: null })
+  tags: string[];
 
-  @Prop({ default: null })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: null })
   blocked: string[];
 
-  @Prop({ default: null })
-  groups: string[];
-
-  @Prop({ default: null })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notification',
+    default: null,
+  })
   notifications: string[];
 
   @Prop({

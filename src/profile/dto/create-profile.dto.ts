@@ -11,11 +11,9 @@ export class CreateProfileDto {
     public bio: string,
     public followers: string[],
     public following: string[],
-    public posts: string[],
     public saved: string[],
-    public tag: string[],
+    public tags: string[],
     public blocked: string[],
-    public groups: string[],
     public notifications: string[],
     public messages: string[],
   ) {}
