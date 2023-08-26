@@ -7,15 +7,15 @@ import {
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post } from './entities/post.entity';
+import { Posts } from './entities/post.entity';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PostService {
-  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
+  constructor(@InjectModel(Posts.name) private postModel: Model<Posts>) {}
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
+  async create(createPostDto: CreatePostDto): Promise<Posts> {
     try {
       const post = new this.postModel(createPostDto);
       return await post.save();
@@ -73,16 +73,24 @@ export class PostService {
     }
   }
 
-  async findAllAndSort() {
-    try {
-      const posts = await this.postModel.find().sort({ createdAt: -1 }).exec();
-      return posts;
-    } catch (error) {
-      throw new HttpException(error.message, error.status);
-    }
+  async findAllAndSort(
+    page: number,
+    limit: number,
+    sortBy = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc',
+  ): Promise<Posts[]> {
+    const sortOptions = { [sortBy]: sortOrder };
+    const skip = page * limit;
+    const posts = await this.postModel
+      .find()
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    return posts;
   }
 
-  async like(id: string, profileId: string): Promise<Post> {
+  async like(id: string, profileId: string): Promise<Posts> {
     try {
       const post = await this.postModel.findOneAndUpdate(
         { id: id },
@@ -92,17 +100,13 @@ export class PostService {
         { new: true },
       );
 
-      if (!post) {
-        throw new NotFoundException('Post not found');
-      }
-
       return post;
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
   }
 
-  async unlike(id: string, profileId: string): Promise<Post> {
+  async unlike(id: string, profileId: string): Promise<Posts> {
     try {
       const post = await this.postModel.findOneAndUpdate(
         { id: id },
@@ -112,9 +116,21 @@ export class PostService {
         { new: true },
       );
 
-      if (!post) {
-        throw new NotFoundException('Post not found');
-      }
+      return post;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+  }
+
+  async share(id: string, profileId: string): Promise<Posts> {
+    try {
+      const post = await this.postModel.findOneAndUpdate(
+        { id: id },
+        {
+          $addToSet: { shares: profileId },
+        },
+        { new: true },
+      );
 
       return post;
     } catch (error) {

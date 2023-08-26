@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNotEmpty } from 'class-validator';
 import mongoose, { HydratedDocument } from 'mongoose';
 
-export type PostDocument = HydratedDocument<Post>;
+export type PostsDocument = HydratedDocument<Posts>;
 
 @Schema({ timestamps: true })
-export class Post {
+export class Posts {
   @Prop({ required: true, unique: true })
   id: string;
 
@@ -24,23 +24,26 @@ export class Post {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ default: null })
+  @Prop({ default: [] })
   media: string[];
 
-  @Prop({ default: null })
+  @Prop({ default: [] })
   tags: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: [] })
   likes: string[];
 
-  @Prop({ default: null })
+  @Prop({ default: [] })
   comments: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile', default: [] })
   shares: string[];
 
-  @Prop({ default: null })
+  @Prop({ default: [] })
   bookmarks: string[];
+
+  @Prop({ default: false })
+  isPrivate: boolean;
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+export const PostsSchema = SchemaFactory.createForClass(Posts);

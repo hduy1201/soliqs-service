@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { ProfileModule } from './profile/profile.module';
 import { StorageModule } from './storage/storage.module';
 import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PostModule } from './post/post.module';
     ProfileModule,
     StorageModule,
     PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

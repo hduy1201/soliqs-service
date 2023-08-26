@@ -12,5 +12,6 @@ export class CreatePostDto {
     public comments: string[],
     public shares: string[],
     public bookmarks: string[],
+    public isPrivate: boolean,
   ) {}
 }
